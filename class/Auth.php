@@ -2,12 +2,11 @@
 class Auth {
     private $conn;
 
-    public function __construct(PDO $conn) {
+   public function __construct(PDO $conn) {
         $this->conn = $conn;
     }
 
     public function login($email, $password) {
-        
         $sql = "SELECT * FROM users WHERE email = :email";
         $stmt = $this->conn->prepare($sql);
         

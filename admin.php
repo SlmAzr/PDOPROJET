@@ -1,34 +1,12 @@
 <?php
 require_once __DIR__ . "/setup/db_connect.php";
+require_once __DIR__ . "/class/Action.php";
 session_start();
 if (!isset($_SESSION["user"]["role"]) || $_SESSION["user"]["role"] === 'user') {
     header("Location: home.php");
     exit;
 }
-class Action
-{
-    private $conn;
 
-    public function __construct(PDO $conn)
-    {
-        $this->conn = $conn;
-    }
-
-    public function getUsers()
-    {
-        $sql = "SELECT id_users, pseudo, email, role FROM users";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function deleteUser(int $id)
-    {
-        $sql = "DELETE FROM users WHERE id_users = :id";
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute(['id' => $id]);
-    }
-}
 $userAction = new Action($conn);
 $users = $userAction->getUsers();
 
