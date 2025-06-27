@@ -66,6 +66,7 @@ if (isset($_POST['logout'])) {
         margin: 10px ;
     }
 </style>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

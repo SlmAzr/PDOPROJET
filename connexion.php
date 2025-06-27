@@ -1,40 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . "/setup/db_connect.php";
-   
-class User {
-    private $conn;
-
-    public function __construct(PDO $conn) {
-        $this->conn = $conn;
-    }
-
-    public function login($email, $password) {
-        $sql = "SELECT * FROM users WHERE email = :email";
-        $stmt = $this->conn->prepare($sql);
-        
-        if (!$stmt) {
-            die("Erreur de préparation.");
-        }
-
-        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
-        $stmt->execute();
-
-        $user = $stmt->fetch();
-
-        if ($user && password_verify($password, $user["password"])) {
-            $_SESSION["user"] = [
-                "id_users" => $user["id_users"],
-                "pseudo" => $user["pseudo"],
-                "email" => $user["email"],
-                "role" => $user["role"]
-            ];
-            return true;
-        }
-
-        return false;
-    }
-}
+require_once __DIR__ . "/class/auth.php";
 
 $error = "";
 
@@ -45,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (empty($email) || empty($password)) {
         $error = "Tous les champs sont obligatoires.";
     } else {
-        $user = new User($conn);
+        $user = new Auth($conn);
         if ($user->login($email, $password)) {
             header("Location: home.php");
             exit;
@@ -85,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <h2>Connexion</h2>
 
         <?php if (!empty($error)) : ?>
-            <p class="error"><?= htmlspecialchars($error) ?></p>
+            <p class="error"><?= $error ?></p>
         <?php endif; ?>
 
         <form action="" method="post">

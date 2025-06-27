@@ -1,38 +1,7 @@
 <?php
 
 require_once __DIR__ . "/setup/db_connect.php";
-
-class User
-{
-    public $pseudo;
-    public $email;
-    public $password;
-    public $role;
-    private $conn;
-
-    public function __construct($conn, $pseudo, $email, $password, $role)
-    {
-        $this->pseudo = $pseudo;
-        $this->email = $email;
-        $this->password = $password;
-        $this->role = $role;
-        $this->conn = $conn;
-    }
-
-    public function save() {
-        $sql = "INSERT INTO users (pseudo, email, password, role) VALUES (:pseudo, :email, :password, :role)";
-        $stmt = $this->conn->prepare($sql);
-        if (!$stmt) {
-            die("Erreur de préparation.");
-        }
-        $stmt->bindParam(':pseudo', $this->pseudo, PDO::PARAM_STR);
-        $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
-        $stmt->bindParam(':password', $this->password, PDO::PARAM_STR);
-        $stmt->bindParam(':role', $this->role, PDO::PARAM_STR);
-
-        return $stmt->execute();
-    }
-}
+require_once __DIR__ . "/class/user.php";
 
 $error = "";
 $successMsg = "";
@@ -47,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pseudo"], $_POST["ema
         $error = "Tous les champs sont obligatoires.";
     } else {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $user = new User($conn, $pseudo, $email, $hashedPassword, $role);
+        $user = new SignUp($conn, $pseudo, $email, $hashedPassword, $role);
         $success = $user->save();
 
         if ($success) {
@@ -87,11 +56,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["pseudo"], $_POST["ema
 <body>
     <section>
         <?php if (!empty($error)) : ?>
-            <p style="color: red;"><?= htmlspecialchars($error) ?></p>
+            <p style="color: red;"><?= $error ?></p>
         <?php endif; ?>
 
         <?php if (!empty($successMsg)) : ?>
-            <p style="color: green;"><?= htmlspecialchars($successMsg) ?></p>
+            <p style="color: green;"><?= $successMsg ?></p>
         <?php endif; ?>
 
         <form action="" method="post">
